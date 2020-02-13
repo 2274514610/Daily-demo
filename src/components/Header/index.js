@@ -7,6 +7,7 @@ class Index extends React.Component {
             text: ''
         }
     }
+
     handChange = (e)=> {
         this.setState({
             text: e.target.value
