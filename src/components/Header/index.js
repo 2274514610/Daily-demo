@@ -6,6 +6,7 @@ class Index extends React.Component {
         this.state = {
             text: ''
         }
+
     }
     handChange = (e)=> {
         this.setState({
