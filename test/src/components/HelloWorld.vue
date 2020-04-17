@@ -9,6 +9,12 @@
         <a-select-option value="G5">京昆高速</a-select-option>
         <a-select-option value="G6">京藏高速</a-select-option>
         <a-select-option value="G7">京新高速</a-select-option>
+        <a-select-option value="G75">兰海高速</a-select-option>
+        <a-select-option value="G10">绥满高速</a-select-option>
+        <a-select-option value="G12">珲春高速</a-select-option>
+        <a-select-option value="G16">丹锡高速</a-select-option>
+        <a-select-option value="G18">荣乌高速</a-select-option>
+        <a-select-option value="G36">宁洛高速</a-select-option>
       </a-select>
     </div>
     <div style="position: absolute;top: 38px;right: 0;z-index:998;padding: 20px">
@@ -46,6 +52,8 @@
                 PointData: '',  //海量点坐标
                 pointCollection_Hm: '',  //存储百米桩坐标点
                 pointCollection_Km: '',  //存储千米桩坐标点
+                markerstart: '',  //存储起点
+                markerend: '',   //存储终点
             }
         },
         components: {},
@@ -61,7 +69,7 @@
                     this.formatting('116.554678,39.874977', '126.62679,45.643178');
                 } else if (value == 'G2') {
                     // console.log('京沪高速')
-                    this.formatting('116.554678,39.874977', '121.086648,31.325675');
+                    this.formatting('116.602247,39.74025', '121.086648,31.325675');
                 } else if (value == 'G3') {
                     // console.log('京台高速')
                     this.formatting('116.455164,39.722139', '119.635848,25.707961');
@@ -74,13 +82,31 @@
                 } else if (value == 'G6') {
                     // console.log('京藏高速')
                     this.formatting('116.226513,40.222865', '90.717376,29.914123');
-                } else {
+                } else if (value == 'G7') {
                     // console.log('京新高速')
                     this.formatting('115.961958,40.509827', '88.666598,43.074229');
+                } else if (value == 'G75') {
+                    //兰海高速
+                    this.formatting('103.776133,35.997652', '109.902505,21.567699');
+                } else if (value == 'G10') {
+                    //绥满高速
+                    this.formatting('131.047871,44.385387', '120.247364,49.187572');
+                } else if (value == 'G12') {
+                    //珲春高速
+                    this.formatting('130.356949,42.819331', '122.172855,46.075304');
+                } else if (value == 'G16') {
+                    //丹锡高速
+                    this.formatting('123.539996,39.978548', '116.148809,43.905088');
+                } else if (value == 'G18') {
+                    //荣乌高速
+                    this.formatting('116.89778,39.174702', '106.856162,39.3239');
+                } else if (value == 'G20') {
+                    //宁洛高速
+                    this.formatting('118.878311,32.111152', '112.366288,34.594791');
                 }
             },
             initBMap() {
-                let map = new BMap.Map("myBMap");
+                let map = new BMap.Map("myBMap", {enableMapClick: false});
                 map.centerAndZoom(new BMap.Point(116.404, 39.915), 12);
                 map.enableScrollWheelZoom();  //启用滚轮放大缩小
                 this.map = map;
@@ -102,13 +128,29 @@
                         // console.log('我是距离',output);
                     }, 1000);
                 };
-
+                let onMarkersSet = (pois) => {
+                    console.log(111111111111111111111, pois);
+                    this.map.removeOverlay(this.markerstart);
+                    this.map.removeOverlay(this.markerend);
+                    let myIconB = new BMap.Icon('https://webmap0.bdimg.com/wolfman/static/common/images/markers_new2_7621a9c.png',
+                        new BMap.Size(50,50));
+                    let markerstart = new BMap.Marker(pois[0].marker.getPosition(),{icon:myIconB}); // 创建新起点
+                    this.markerstart = markerstart;
+                    this.map.removeOverlay(pois[0].marker); //删除原来的起点
+                    this.map.addOverlay(this.markerstart);
+                    let markerend = new BMap.Marker(pois[1].marker.getPosition()); // 创建新终点
+                    this.markerend = markerend;
+                    this.map.removeOverlay(pois[1].marker);//删除原来的终点
+                    this.map.addOverlay(this.markerend);
+                };
                 //驾车实例
                 let transit = new BMap.DrivingRoute(this.map, {
-                    renderOptions: {map: this.map},   //搜索结果呈现的配置
+                    renderOptions: {map: this.map,},   //搜索结果呈现的配置
                     onSearchComplete: searchComplete,   //检索完成后的回调函数
-                    onPolylinesSet: polylinesSet,
+                    onPolylinesSet: polylinesSet,    //折线添加完成后的回调函数
+                    onMarkersSet: onMarkersSet,   //标注添加完成后的回调函数
                 });
+
                 if (this.transit) {
                     this.transit.clearResults()
                 }
@@ -206,10 +248,10 @@
                     color: '#f00'
                 };
                 let pointCollection_Hm = new BMap.PointCollection(points_Hm, options_Hm);  // 百米桩
-                pointCollection_Hm.addEventListener('click',(e)=> {
-                    console.log(11111111111111111,e);
+                pointCollection_Hm.addEventListener('click', (e) => {
+                    console.log(11111111111111111, e);
                     e.number = '我是11111111111111';
-                   alert('百米桩')
+                    alert('百米桩')
                 });
                 if (this.pointCollection_Hm) {
                     this.pointCollection_Hm.clear()
@@ -217,7 +259,7 @@
                 this.pointCollection_Hm = pointCollection_Hm;
                 this.map.addOverlay(pointCollection_Hm);  // 添加Overlay
                 let pointCollection_Km = new BMap.PointCollection(points_km, options_Km);  // 千米桩
-                pointCollection_Km.addEventListener('click',()=> {
+                pointCollection_Km.addEventListener('click', () => {
                     alert('千米桩')
                 });
                 if (this.pointCollection_Km) {

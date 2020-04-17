@@ -1,16 +1,17 @@
 <template>
   <div id="app">
-    <HelloWorld/>
+    <baidu-map/>
   </div>
 </template>
 
 <script>
-    import HelloWorld from './components/HelloWorld'
-
+    // import HelloWorld from './components/HelloWorld'
+    import BaiduMap from "./components/BaiduMap";
     export default {
         name: 'App',
         components: {
-            HelloWorld,
+            // HelloWorld,
+            BaiduMap
         }
     }
 </script>
